@@ -20,13 +20,82 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  constructor(isDirect){
+    if(isDirect != false){
+      this.isDirect = true;
+    }
+    this.sequence = "abcdefghijklmnopqrstuvwxyz";
   }
-  decrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+
+  encrypt(string, key) {
+    if(!string || !key){
+      throw new Error('Incorrect arguments!');
+    }
+    string = string.toLowerCase();
+    key = key.toLowerCase();
+    let longKey = this.convertKey(string, key);
+    let result = Array.from(string).map((char, index)=>{
+      if(longKey[index] == ' '){
+        return char;
+      }
+      let stringIndex = this.convertToIndex(char);
+      let keyIndex = this.convertToIndex(longKey[index]);
+      let cipherIndex = (stringIndex + keyIndex) % 26;
+      return this.convertToChar(cipherIndex).toUpperCase();
+    });
+    if(!this.isDirect){
+      return result.reverse().join('');
+    }else{
+      return result.join('');
+    }
+  }
+
+  decrypt(string, key) {
+    if(!string || !key){
+      throw new Error('Incorrect arguments!');
+    }
+    string = string.toLowerCase();
+    key = key.toLowerCase();
+    let longKey = this.convertKey(string, key);
+    let result = Array.from(string).map((char, index)=>{
+      if(longKey[index] == ' '){
+        return char;
+      }
+      let stringIndex = this.convertToIndex(char);
+      let keyIndex = this.convertToIndex(longKey[index]);
+      let cipherIndex = (stringIndex - keyIndex + 26) % 26;
+      return this.convertToChar(cipherIndex).toUpperCase();
+    });
+    if(!this.isDirect){
+      return result.reverse().join('');
+    }else{
+      return result.join('');
+    }
+  }
+
+  convertToIndex(value){
+    return this.sequence.indexOf(value);
+  }
+
+  convertToChar(value){
+    return this.sequence.charAt(value);
+  }
+
+  convertKey(string, key){
+    let index = 0;
+    let result = '';
+    Array.from(string).forEach((stringChar) => {
+      if(this.sequence.indexOf(stringChar) == -1){
+        result += ' ';
+        return;
+      }
+      if(index > key.length - 1){
+        index = 0;
+      }
+      result += key[index];
+      index++;
+    });
+    return result;
   }
 }
 

@@ -1,3 +1,4 @@
+const { useFakeServer } = require('sinon');
 const { NotImplementedError } = require('../extensions/index.js');
 
 /**
@@ -22,9 +23,20 @@ const { NotImplementedError } = require('../extensions/index.js');
  * }
  *
  */
-function getDNSStats(/* domains */) {
-  throw new NotImplementedError('Not implemented');
-  // remove line with error and write your code here
+ function getDNSStats(domains) {
+  let stats = {};
+  for(domain of domains){
+    let paths = domain.split('.').reverse();
+    for(let i = 0; i < paths.length; i++){
+      let path = '.' + paths.filter((value,index)=> index<=i).join('.');
+      if(stats[path] == undefined){
+        stats[path] = 1;
+      } else {
+        stats[path]++;
+      }
+    }
+  }
+  return stats;
 }
 
 module.exports = {
